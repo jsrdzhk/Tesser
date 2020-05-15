@@ -2,11 +2,11 @@
 @Author: Rodney Cheung
 @Date: 2020-05-13 10:58:02
 @LastEditors: Rodney Cheung
-@LastEditTime: 2020-05-15 17:11:44
+@LastEditTime: 2020-05-15 18:09:00
 @FilePath: /Tesser/main.py
 '''
 import tesserocr
-from tesserocr import PyTessBaseAPI
+from tesserocr import PyTessBaseAPI, RIL
 from PIL import Image, ImageOps
 import os
 import argparse
@@ -72,6 +72,15 @@ def ocr(tess_api, img_path):
             tess_api.AllWordConfidences()))
 
 
+def png_to_jpeg(src):
+    img = Image.open(src)
+    base, _ = filename_component(src)
+    rgb_img = img.convert('RGB')
+    new_name = base + '.jpg'
+    rgb_img.save(new_name)
+    return new_name
+
+
 def filename_component(file_name):
     file_name_components = os.path.splitext(file_name)
     base_name = file_name_components[0]
@@ -80,6 +89,9 @@ def filename_component(file_name):
 
 
 def image_invert(src, dst, quality):
+    _, ext = filename_component(src)
+    if 'png' in ext:
+        src = png_to_jpeg(src)
     img = Image.open(src)
     img_invert = ImageOps.invert(img)
     img_invert.save(dst, quality=quality)
